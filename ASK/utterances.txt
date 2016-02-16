@@ -1,0 +1,69 @@
+WhatsVisible what I can see
+WhatsVisible what I can see at {Time}
+WhatsVisible what I can see {When}
+WhatsVisible what I'll see
+WhatsVisible what I'll see at {Time}
+WhatsVisible what I'll see {When}
+WhatsVisible what I'm seeing
+WhatsVisible what can I see
+WhatsVisible what can I see at {Time}
+WhatsVisible what can I see {When}
+WhatsVisible what can we see
+WhatsVisible what can we see at {Time}
+WhatsVisible what can we see {When}
+WhatsVisible what there is to see
+WhatsVisible what we can see
+WhatsVisible what we can see at {Time}
+WhatsVisible what we can see {When}
+WhatsVisible what we'll see
+WhatsVisible what we'll see at {Time}
+WhatsVisible what we'll see {When}
+WhatsVisible what we're seeing
+WhatsVisible what's currently visible
+WhatsVisible what's out
+WhatsVisible what's out at {Time}
+WhatsVisible what's out {When}
+WhatsVisible what's up
+WhatsVisible what's up at {Time}
+WhatsVisible what's up {When}
+WhatsVisible what's visible
+WhatsVisible what's visible at {Time}
+WhatsVisible what's visible {When}
+
+WhereIsObject about {CelestialObject}
+WhereIsObject where I can find {CelestialObject}
+WhereIsObject where do I look for {CelestialObject}
+WhereIsObject where do we look for {CelestialObject}
+WhereIsObject where to look for {CelestialObject}
+WhereIsObject where we can find {CelestialObject}
+WhereIsObject where {CelestialObject} is
+WhereIsObject where {CelestialObject} is in the sky
+WhereIsObject where {CelestialObject} is in the sky now
+WhereIsObject where {CelestialObject} is in the sky right now
+WhereIsObject where {CelestialObject} is now
+WhereIsObject where {CelestialObject} is right now
+
+ObjectRise when will {CelestialObject} rise
+
+ObjectSet when will {CelestialObject} set
+
+WhatDoISee what I see at {Azimuth} and {Altitude}
+WhatDoISee what I see at {Azimuth} degrees and {Altitude} degrees
+WhatDoISee what I see at {Azimuth} degrees azimuth and {Altitude} degrees altitude
+WhatDoISee what I see at {Azimuth} {Altitude}
+WhatDoISee what do I see at {Azimuth} and {Altitude}
+WhatDoISee what do I see at {Azimuth} degrees and {Altitude} degrees
+WhatDoISee what do I see at {Azimuth} degrees azimuth and {Altitude} degrees altitude
+WhatDoISee what do I see at {Azimuth} {Altitude}
+WhatDoISee what do we see at {Azimuth} and {Altitude}
+WhatDoISee what do we see at {Azimuth} degrees and {Altitude} degrees
+WhatDoISee what do we see at {Azimuth} degrees azimuth and {Altitude} degrees altitude
+WhatDoISee what do we see at {Azimuth} {Altitude}
+WhatDoISee what we see at {Azimuth} and {Altitude}
+WhatDoISee what we see at {Azimuth} degrees and {Altitude} degrees
+WhatDoISee what we see at {Azimuth} degrees azimuth and {Altitude} degrees altitude
+WhatDoISee what we see at {Azimuth} {Altitude}
+WhatDoISee what's at {Azimuth} and {Altitude}
+WhatDoISee what's at {Azimuth} degrees and {Altitude} degrees
+WhatDoISee what's at {Azimuth} degrees azimuth and {Altitude} degrees altitude
+WhatDoISee what's at {Azimuth} {Altitude}

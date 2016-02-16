@@ -1,0 +1,10 @@
+sun
+moon
+Mercury
+Venus
+Mars
+Jupiter
+Saturn
+Uranus
+Neptune
+Pluto

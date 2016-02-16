@@ -1,0 +1,60 @@
+{
+  "intents": [
+    {
+      "intent": "WhatsVisible",
+      "slots": [
+        {
+          "name": "When",
+          "type": "LIST_OF_NON_SPECIFIC_TIMES"
+        },
+        {
+          "name": "Time",
+          "type": "AMAZON.TIME"
+        }
+      ]
+    },
+    {
+      "intent": "WhereIsObject",
+      "slots": [
+        {
+          "name": "CelestialObject",
+          "type": "LIST_OF_CELESTIAL_OBJECTS"
+        }
+      ]
+    },
+    {
+      "intent": "ObjectRise",
+      "slots": [
+        {
+          "name": "CelestialObject",
+          "type": "LIST_OF_CELESTIAL_OBJECTS"
+        }
+      ]
+    },
+    {
+      "intent": "ObjectSet",
+      "slots": [
+        {
+          "name": "CelestialObject",
+          "type": "LIST_OF_CELESTIAL_OBJECTS"
+        }
+      ]
+    },
+    {
+      "intent": "WhatDoISee",
+      "slots": [
+        {
+          "name": "Azimuth",
+          "type": "AMAZON.NUMBER"
+        },
+        {
+          "name": "Altitude",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    }
+  ]
+}
