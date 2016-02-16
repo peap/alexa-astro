@@ -1,2 +1,2 @@
 # alexa-astro
-Use your Amazon Echo about the night sky
+Ask your Amazon Echo about the night sky
