@@ -84,8 +84,11 @@ def get_response(event):
         )
     elif event_type == 'IntentRequest':
         intent_name = request['intent']['name']
-        func = intents[intent_name]
-        return func(event)
+        func = intents.get(intent_name)
+        if func:
+            return func(event)
+        else:
+            return AlexaResponse('Sorry, that feature isn\'t ready yet.')
     elif event_type == 'SessionEndedRequest':
         return AlexaResponse('Goodbye.')
     else:
