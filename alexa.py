@@ -1,5 +1,9 @@
 import json
 import logging
+import os
+
+import settings
+from signature import signature_valid
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +68,13 @@ class AlexaResponse():
         return data
 
 
-def get_response(event):
+def get_response(request):
+    try:
+        event = request.json
+    except ValueError:
+        abort(400)
+    if not valid_alexa_request(request):
+        abort(403)
     session = event.get('session', {})
     request = event.get('request', {})
     if not session or not request:
@@ -101,3 +111,19 @@ def help(event):
         'Ask me about a planet, a moon, or what you see.'
     )
     return data
+
+
+def valid_alexa_request(request):
+    # check Signature
+    signature = request.headers.get('Signature')
+    cert_chain_url = request.headers.get('SignatureCertChainUrl')
+    request_body = request.data
+    if not signature_valid(signature, cert_chain_url, request_body):
+        return False
+
+    # check Application ID
+    event = request.json
+    sent_id = event['session']['application']['applicationId']
+    if sent_id != settings.AMAZON_APPLICATION_ID:
+        return False
+    return True
