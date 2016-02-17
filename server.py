@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 import logging
 
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, render_template, request
 
-from alexa import get_response
+from alexa import AlexaResponse, get_response
 
 logging.basicConfig(level=logging.WARN)
 
 app = Flask(__name__)
 
 
-# TODO: add POST route just for Alexa requests; main page GET should be webpage
-
 @app.route('/', methods=['GET'])
 def homepage():
-    return 'hey!'
+    return render_template('home.html')
 
 
 @app.route('/alexa/', methods=['POST'])
@@ -23,16 +21,17 @@ def incoming_alexa_request():
     try:
         alexa_response = get_response(request.json)
     except ValueError:
-        # TODO: return valid response for Alexa
-        response_data = {'error': True}
-    else:
-        response_data = alexa_response.to_dict()
-    return jsonify(response_data)
+        alexa_response = AlexaResponse('Bad request, sorry.')
+    return jsonify(alexa_response.to_dict())
 
 
 if __name__ == '__main__':
     import sys
-    # TODO: show usage if no argv[1]
-    app.config['SERVER_NAME'] = sys.argv[1]
-    print('launching server')
+    if len(sys.argv) != 2:
+        sys.stderr.write('Usage: ./server.py host:port\n')
+        sys.exit(1)
+    app.config.update({
+        'SERVER_NAME': sys.argv[1],
+        'DEBUG': True,
+    })
     app.run()
