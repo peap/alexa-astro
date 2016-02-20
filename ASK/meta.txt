@@ -1,0 +1,40 @@
+Application ID
+==============
+amzn1.echo-sdk-ams.app.6f2cd304-8d03-45ae-8135-18e6d3486035
+
+Name
+====
+Pluto the Astronomer
+
+Invocation Name
+===============
+Pluto
+
+Version
+=======
+0.1.0
+
+Short Skill Description (160 characters max)
+============================================
+Pluto is your voice guide to the night sky. Ask what there is to see,
+where your favorite planets are, or what you're looking at.
+
+Full Skill Description
+======================
+Pluto is your voice guide to the night sky. Ask what there is to see,
+where your favorite planets are, or what you're looking at.
+
+
+Example Phrases
+===============
+Alexa, ask Pluto what's visible tonight.
+Alexa, ask Pluto where Jupiter is.
+Alexa, ask Pluto what I see in the southeastern sky at 30 degrees altitude.
+
+Category
+========
+Reference
+
+Keywords
+========
+astronomy, planets, space, stargazing, outdoors

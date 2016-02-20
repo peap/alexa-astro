@@ -1,14 +1,11 @@
-import json
 import logging
-import os
 
-import settings
-from signature import signature_valid
+from flask import abort
+
+from app import settings
+from app.signatures import cert_chain_url_valid, parse_certificate, signature_valid
 
 logger = logging.getLogger(__name__)
-
-__program__ = 'Astro'
-__version__ = '0.1.0'
 
 
 class AlexaResponse():
@@ -16,7 +13,7 @@ class AlexaResponse():
     card_title = None
     ends_session = True
     reprompt_speech = None
-    response_version = __version__
+    response_version = settings.SKILL_VERSION
     speech = None
 
     def __init__(self, speech_text, ends_session=True):
@@ -73,8 +70,10 @@ def get_response(request):
         event = request.json
     except ValueError:
         abort(400)
-    if not valid_alexa_request(request):
+
+    if not alexa_request_valid(request):
         abort(403)
+
     session = event.get('session', {})
     request = event.get('request', {})
     if not session or not request:
@@ -89,8 +88,8 @@ def get_response(request):
 
     if event_type == 'LaunchRequest':
         return AlexaResponse(
-            'Welcome to {0}. Try asking me about a planet.'
-            .format(__program__)
+            'Hi! Call me {0}. Try asking me about a planet.'
+            .format(settings.SKILL_INVOCATION_NAME)
         )
     elif event_type == 'IntentRequest':
         intent_name = request['intent']['name']
@@ -108,22 +107,31 @@ def get_response(request):
 
 def help(event):
     data = AlexaResponse(
-        'Ask me about a planet, a moon, or what you see.'
+        'Ask me about a planet, a moon, or what you see in the sky.'
     )
     return data
 
 
-def valid_alexa_request(request):
-    # check Signature
-    signature = request.headers.get('Signature')
-    cert_chain_url = request.headers.get('SignatureCertChainUrl')
-    request_body = request.data
-    if not signature_valid(signature, cert_chain_url, request_body):
-        return False
-
+def alexa_request_valid(request):
     # check Application ID
     event = request.json
     sent_id = event['session']['application']['applicationId']
     if sent_id != settings.AMAZON_APPLICATION_ID:
+        # TODO: log
         return False
+
+    # check certificate URL
+    cert_chain_url = request.headers.get('SignatureCertChainUrl')
+    if not cert_chain_url_valid(cert_chain_url):
+        # TODO: log
+        return False
+
+    # check signature
+    signature = request.headers.get('Signature')
+    cert_text = parse_certificate(cert_chain_url)
+    request_body = request.data
+    if not signature_valid(signature, cert_text, request_body):
+        # TODO: log
+        return False
+
     return True

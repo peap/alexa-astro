@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys
+
 import ephem
 
 
@@ -38,7 +40,7 @@ if __name__ == '__main__':
     for planet in get_visible_planets(seattle_observer):
         altitude = round(planet.alt / ephem.degree)
         azimuth = round(planet.az / ephem.degree)
-        print(
-            '{0.name}: azimuth {1} degrees, altitude {2} degrees'
+        sys.stdout.write(
+            '{0.name}: azimuth {1} degrees, altitude {2} degrees\n'
             .format(planet, azimuth, altitude)
         )

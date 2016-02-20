@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import logging
 
-from flask import Flask, abort, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request
 
-from alexa import AlexaResponse, get_response, valid_alexa_request
+from app.alexa import AlexaResponse, get_response
 
-logging.basicConfig(level=logging.WARN)
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -25,13 +25,12 @@ def incoming_alexa_request():
 
 
 if __name__ == '__main__':
-    import os
     import sys
     if len(sys.argv) != 2:
         sys.stderr.write('Usage: ./server.py host:port\n')
         sys.exit(1)
     host, port = sys.argv[1].split(':')
-    print('starting server at {0}:{1}'.format(host, port))
+    sys.stdout.write('Starting server at {0}:{1}\n'.format(host, port))
     app.config.update({
         'HOST': host,
         'PORT': port,

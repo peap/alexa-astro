@@ -1,5 +1,7 @@
 sun
+the sun
 moon
+the moon
 Mercury
 Venus
 Mars

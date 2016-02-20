@@ -1,1 +1,0 @@
-AMAZON_APPLICATION_ID = 'amzn1.echo-sdk-ams.app.6f2cd304-8d03-45ae-8135-18e6d3486035'
