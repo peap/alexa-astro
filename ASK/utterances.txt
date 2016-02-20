@@ -1,3 +1,21 @@
+GetLocation my location
+GetLocation where I am
+GetLocation where we are
+
+SetLocation change my location to {City}
+SetLocation set my location to {City}
+SetLocation update my location to {City}
+SetLocation set my latitute to {LatDeg} degrees
+SetLocation set my latitute to {LatDeg} degrees {LatMin} minutes
+SetLocation set my latitute to {LatDeg} degrees and {LatMin} minutes
+SetLocation set my latitute to {LatDeg} degrees {LatMin} minutes {LatSec} seconds
+SetLocation set my latitute to {LatDeg} degrees and {LatMin} minutes and {LatSec} seconds
+SetLocation set my longitude to {LonDeg} degrees {LonEastWest}
+SetLocation set my longitude to {LonDeg} degrees {LonMin} minutes {LonEastWest}
+SetLocation set my longitude to {LonDeg} degrees and {LonMin} minutes {LonEastWest}
+SetLocation set my longitude to {LonDeg} degrees {LonMin} minutes {LonSec} seconds {LonEastWest}
+SetLocation set my longitude to {LonDeg} degrees and {LonMin} minutes and {LonSec} seconds {LonEastWest}
+
 WhatsVisible what I can see
 WhatsVisible what I can see at {Time}
 WhatsVisible what I can see {When}
@@ -43,14 +61,24 @@ WhereIsObject where {CelestialObject} is in the sky right now
 WhereIsObject where {CelestialObject} is now
 WhereIsObject where {CelestialObject} is right now
 
-ObjectRise when will {CelestialObject} rise
+ObjectRise when {CelestialObject} is supposed to rise
+ObjectRise when {CelestialObject} rises
+ObjectRise when {CelestialObject} rises tonight
+ObjectRise when {CelestialObject} will be visible
+ObjectRise when {CelestialObject} will come up
+ObjectRise when {CelestialObject} will rise
 
-ObjectSet when will {CelestialObject} set
+ObjectSet when {CelestialObject} is supposed to set
+ObjectSet when {CelestialObject} sets
+ObjectSet when {CelestialObject} sets tonight
+ObjectSet when {CelestialObject} will go down
+ObjectSet when {CelestialObject} will set
 
 WhatDoISee what I see at {Azimuth} and {Altitude}
 WhatDoISee what I see at {Azimuth} degrees and {Altitude} degrees
 WhatDoISee what I see at {Azimuth} degrees azimuth and {Altitude} degrees altitude
 WhatDoISee what I see at {Azimuth} {Altitude}
+WhatDoISee what I'm seeing at {Azimuth} and {Altitude}
 WhatDoISee what do I see at {Azimuth} and {Altitude}
 WhatDoISee what do I see at {Azimuth} degrees and {Altitude} degrees
 WhatDoISee what do I see at {Azimuth} degrees azimuth and {Altitude} degrees altitude
@@ -63,6 +91,7 @@ WhatDoISee what we see at {Azimuth} and {Altitude}
 WhatDoISee what we see at {Azimuth} degrees and {Altitude} degrees
 WhatDoISee what we see at {Azimuth} degrees azimuth and {Altitude} degrees altitude
 WhatDoISee what we see at {Azimuth} {Altitude}
+WhatDoISee what we're seeing at {Azimuth} and {Altitude}
 WhatDoISee what's at {Azimuth} and {Altitude}
 WhatDoISee what's at {Azimuth} degrees and {Altitude} degrees
 WhatDoISee what's at {Azimuth} degrees azimuth and {Altitude} degrees altitude
