@@ -1,8 +1,10 @@
 import logging
+import sqlite3
 
 from flask import abort
 
 from app import settings
+from app.db import get_db, query_db
 from app.signatures import cert_chain_url_valid, parse_certificate, signature_valid
 
 logger = logging.getLogger(__name__)
@@ -65,6 +67,75 @@ class AlexaResponse():
         return data
 
 
+class AlexaUser():
+    new = False
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+
+        data = self.get_data_by_id(user_id)
+        if data is None:
+            self.new = True
+            self.create(user_id)
+            data = self.get_data_by_id(user_id)
+
+        self.pk = data['id']
+        self.latitude = data['latitude']
+        self.longitude = data['longitude']
+
+    @classmethod
+    def create(cls, user_id):
+        logging.info('Creating user record for {0}'.format(user_id))
+        db = get_db()
+        cur = db.cursor()
+        cur.execute('insert into alexa_users(amazon_id) values (?)', [user_id])
+        db.commit()
+
+    @classmethod
+    def get_data_by_id(self, user_id):
+        query = (
+            'select id, latitude, longitude from alexa_users '
+            'where amazon_id = ?'
+        )
+        user_data = query_db(query, args=[user_id], one=True)
+        if user_data is None:
+            return None
+        else:
+            return {
+                'id': user_data[0],
+                'latitude': user_data[1],
+                'longitude': user_data[2],
+            }
+
+
+def alexa_request_valid(request):
+    # check Application ID
+    event = request.json
+    sent_id = event['session']['application']['applicationId']
+    if sent_id != settings.AMAZON_APPLICATION_ID:
+        # TODO: log
+        return False
+
+    # check timestamp
+    # TODO!
+
+    # check certificate URL
+    cert_chain_url = request.headers.get('SignatureCertChainUrl')
+    if not cert_chain_url_valid(cert_chain_url):
+        # TODO: log
+        return False
+
+    # check signature
+    signature = request.headers.get('Signature')
+    cert_text = parse_certificate(cert_chain_url)
+    request_body = request.data
+    if not signature_valid(signature, cert_text, request_body):
+        # TODO: log
+        return False
+
+    return True
+
+
 def get_response(request):
     try:
         event = request.json
@@ -79,6 +150,8 @@ def get_response(request):
     if not session or not request:
         # bad request
         return AlexaResponse('Sorry, there was an error.')
+
+    user = AlexaUser(session['user']['userId'])
 
     event_type = request['type']
 
@@ -110,28 +183,3 @@ def help(event):
         'Ask me about a planet, a moon, or what you see in the sky.'
     )
     return data
-
-
-def alexa_request_valid(request):
-    # check Application ID
-    event = request.json
-    sent_id = event['session']['application']['applicationId']
-    if sent_id != settings.AMAZON_APPLICATION_ID:
-        # TODO: log
-        return False
-
-    # check certificate URL
-    cert_chain_url = request.headers.get('SignatureCertChainUrl')
-    if not cert_chain_url_valid(cert_chain_url):
-        # TODO: log
-        return False
-
-    # check signature
-    signature = request.headers.get('Signature')
-    cert_text = parse_certificate(cert_chain_url)
-    request_body = request.data
-    if not signature_valid(signature, cert_text, request_body):
-        # TODO: log
-        return False
-
-    return True
