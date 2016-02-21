@@ -140,15 +140,17 @@ def set_location(alexa_request):
             city, coords = get_coordinates_for_city(in_city, state=in_state)
         except CityNotFound:
             response = AlexaResponse(
-                'I couldn\'t find a city called {0}.'.format(search_str)
-            )
-            response.ask('Where are you located?')
-        except CityNotSpecificEnough:
-            response = AlexaResponse(
-                'There are multiple places named {0}.'
+                'I couldn\'t find a city called {0}. What\'s another city that '
+                'is nearby?'
                 .format(search_str)
             )
-            response.ask('Which one do you mean?')
+            response.reprompt('Where are you located?')
+        except CityNotSpecificEnough:
+            response = AlexaResponse(
+                'There are multiple places named {0}. Which one did you mean?'
+                .format(search_str)
+            )
+            response.reprompt('Which {0} did you mean?'.format(search_str))
             response.add_to_session('city', in_city)
         else:
             alexa_request.user.set_location(coords[0], coords[1], city)
@@ -172,10 +174,10 @@ def set_location(alexa_request):
                 )
             except CityNotSpecificEnough:
                 response = AlexaResponse(
-                    'There are multiple places named {0}.'
+                    'There are multiple places named {0}. Which one did you mean?'
                     .format(search_str)
                 )
-                response.ask('Which one do you mean?')
+                response.reprompt('Which {0} did you mean?'.format(search_str))
                 response.add_to_session('city', in_city)
             else:
                 alexa_request.user.set_location(coords[0], coords[1], city)
@@ -228,10 +230,13 @@ def whats_visible(alexa_request):
                 response = AlexaResponse(
                     'There are a several objects visible right now, including '
                     '{0.name}, {1.name}, and {2.name}. To locate them, say '
-                    '"Alexa, ask {3} about {0.name}".'
+                    '"Alexa, ask {3} about {0.name}". Would you like to hear '
+                    'the entire list?'
                     .format(obj1, obj2, obj3, settings.SKILL_INVOCATION_NAME)
                 )
-                response.ask('Would you like to hear the entire list?')
+                response.reprompt(
+                    'Would you like to hear the entire list of visible objects?'
+                )
                 response.add_to_session('previousIntent', 'WhatsVisible')
                 response.add_to_session('question', 'hear full list')
         else:
@@ -244,12 +249,14 @@ def whats_visible(alexa_request):
         if alexa_request.session['new']:
             response = AlexaResponse(
                 'Hello from {0}. To get started, I need to know where you\'re '
-                'located.'
+                'located. What city is closest to you?'
                 .format(settings.SKILL_NAME)
             )
         else:
-            response = AlexaResponse('I don\'t know your location.')
-        response.ask('What city are you closest to?')
+            response = AlexaResponse(
+                'I don\'t know your location. What city is closest to you?'
+            )
+        response.reprompt('What city is closest to you?')
         response.add_to_session('previousIntent', 'WhatsVisible')
         response.add_to_session('question', 'closest city')
     return response

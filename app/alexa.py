@@ -65,10 +65,6 @@ class AlexaResponse():
     def add_to_session(self, key, val):
         self.session_attributes[key] = val
 
-    def ask(self, question):
-        self.ends_session = False
-        self.reprompt_speech = question
-
     def card(self, title, text):
         self.card_title = title
         self.card_text = text
@@ -87,6 +83,10 @@ class AlexaResponse():
               'text': self.reprompt_speech,
             },
         }
+
+    def reprompt(self, question):
+        self.ends_session = False
+        self.reprompt_speech = question
 
     def get_speech_dict(self):
         return {
