@@ -1,12 +1,16 @@
 #!/usr/bin/env python
-from app import app
+import os
+
+from app import app, settings
 from app.db import get_db
+
+SCHEMA_FILE = os.path.join(settings.BASE_DIR, 'schema.sql')
 
 
 def main():
     with app.app_context():
         db = get_db()
-        with app.open_resource('schema.sql', mode='r') as f:
+        with app.open_resource(SCHEMA_FILE, mode='r') as f:
             db.cursor().executescript(f.read())
             db.commit()
 
