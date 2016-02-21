@@ -1,7 +1,5 @@
 import logging
 
-from flask import abort
-
 from app import settings
 from app.db import get_db, query_db
 from app.signatures import cert_chain_url_valid, parse_certificate, signature_valid
@@ -165,31 +163,3 @@ class AlexaUser():
         self.latitude = latitude
         self.longitude = longitude
         self.city = city
-
-
-def get_response(request):
-    from app import handlers
-
-    try:
-        alexa_request = AlexaRequest(request)
-    except ValueError:
-        abort(400)
-
-    if not alexa_request.is_valid():
-        abort(403)
-
-    if alexa_request.request_type == 'LaunchRequest':
-        return handlers.welcome(alexa_request)
-    elif alexa_request.request_type == 'IntentRequest':
-        intent_name = alexa_request.intent_name
-        func = handlers.INTENTS.get(intent_name)
-        if func:
-            return func(alexa_request)
-        else:
-            logger.warning('Got an unhandled intent: {0}'.format(intent_name))
-            return AlexaResponse('Sorry, that feature isn\'t ready yet.')
-    elif alexa_request.request_type == 'SessionEndedRequest':
-        return AlexaResponse('Goodbye.')
-    else:
-        # weirrrrrd
-        return AlexaResponse('I am not sure what you meant.')

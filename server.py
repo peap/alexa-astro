@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 import logging
 
-from flask import jsonify, render_template, request
+from flask import abort, jsonify, render_template, request
 
-from app import app, alexa
+from app import app
+from app.alexa import AlexaRequest
+from app.handlers import dispatch
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('requests').setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,10 +21,15 @@ def homepage():
 @app.route('/alexa/', methods=['POST'])
 def incoming_alexa_request():
     try:
-        alexa_response = alexa.get_response(request)
-    except ValueError as e:
-        logger.exception(e)
-        alexa_response = alexa.AlexaResponse('Bad request, sorry.')
+        alexa_request = AlexaRequest(request)
+    except ValueError:
+        abort(400)
+
+    if alexa_request.is_valid():
+        alexa_response = dispatch(alexa_request)
+    else:
+        abort(403)
+
     return jsonify(alexa_response.to_dict())
 
 
