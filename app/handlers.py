@@ -1,6 +1,6 @@
 from app.alexa import AlexaResponse
 from app.location import (
-    CityNotFound, CityNotSpecificEnough, get_coorinates_of_city,
+    CityNotFound, CityNotSpecificEnough, get_coordinates_for_city,
 )
 
 INTENTS = {}
@@ -32,7 +32,7 @@ def overview(alexa_request):
 def set_location(alexa_request):
     requested_city = alexa_request.slots['City'].get('value')
     if requested_city:
-        city, coords = get_coorinates_of_city(requested_city)
+        city, coords = get_coordinates_for_city(requested_city)
         try:
             alexa_request.user.set_location(city, *coords)
         except CityNotFound:
