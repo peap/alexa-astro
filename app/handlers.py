@@ -6,13 +6,17 @@ from app.location import (
 INTENTS = {}
 
 
-def intent_handler(func, name):
-    INTENTS[name] = func
+def intent_handler(name):
 
-    def inner(*args, **kwargs):
-        return func(*args, **kwargs)
+    def wrapper(func):
+        INTENTS[name] = func
 
-    return inner
+        def inner(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return inner
+
+    return wrapper
 
 
 def welcome(alexa_request):
