@@ -39,25 +39,7 @@ def get_coordinates_from_db(city):
         return None
 
 
-def get_coordinates_for_city(city, state=None):
-    """
-    Get the latitude and longitude for the provided string, which can be
-    anything you think Wikipedia will be able to disambiguate.
-
-    Return tuple of discovered city name and coordinates tuple. Example:
-
-    >>> get_coordinates_for_city('seattle')
-    ('Seattle', (Decimal('47.60972'), Decimal('-122.33306')))
-    """
-    if state:
-        search_str = ', '.join([city, state])
-    else:
-        search_str = city
-
-    db_coords = get_coordinates_from_db(search_str)
-    if db_coords:
-        return (search_str, db_coords)
-
+def get_coordinates_from_wikipedia(search_str):
     try:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
@@ -71,5 +53,24 @@ def get_coordinates_for_city(city, state=None):
         raise CityNotFound()
     else:
         coords = (lat.quantize(FIVE_PLACES), lon.quantize(FIVE_PLACES))
-        add_coordinates_to_db(coords, search_str)
         return (page.title, coords)
+
+
+def get_coordinates_for_city(city, state=None):
+    """
+    Get the latitude and longitude for the provided string, which can be
+    anything you think Wikipedia will be able to disambiguate.
+
+    Return tuple of discovered city name and coordinates tuple. Example:
+
+    >>> get_coordinates_for_city('seattle')
+    ('Seattle', (Decimal('47.60972'), Decimal('-122.33306')))
+    """
+    search_str = ', '.join([city, state]) if state else city
+    db_coords = get_coordinates_from_db(search_str)
+    if db_coords:
+        return (search_str, db_coords)
+    else:
+        page_title, coords = get_coordinates_from_wikipedia(search_str)
+        add_coordinates_to_db(coords, search_str)
+        return (page_title, coords)
