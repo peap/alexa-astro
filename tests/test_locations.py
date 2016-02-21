@@ -10,11 +10,11 @@ from app.location import get_coordinates_for_city
 CITIES_ON_WIKIPEDIA = {
     'Austin': {
         'coords': ('30.25000', '-97.75000'),
-        'pickle': os.path.join(settings.BASE_DIR, 'tests', 'austin.p'),
+        'pickle': os.path.join(settings.BASE_DIR, 'tests', 'data', 'austin.p'),
     },
     'Seattle': {
         'coords': ('47.60972', '-122.33306'),
-        'pickle': os.path.join(settings.BASE_DIR, 'tests', 'seattle.p'),
+        'pickle': os.path.join(settings.BASE_DIR, 'tests', 'data', 'seattle.p'),
     },
 }
 
