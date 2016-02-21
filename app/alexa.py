@@ -164,7 +164,7 @@ def get_response(request):
     from app import handlers
 
     try:
-        alexa_request = AlexaRequest(request.json)
+        alexa_request = AlexaRequest(request)
     except ValueError:
         abort(400)
 
