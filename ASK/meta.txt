@@ -12,7 +12,7 @@ Pluto
 
 Version
 =======
-0.1.0
+0.2.0
 
 Short Skill Description (160 characters max)
 ============================================

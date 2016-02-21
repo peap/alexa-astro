@@ -8,4 +8,4 @@ DATABASE_FILE = os.path.join(BASE_DIR, 'db.sqlite')
 
 SKILL_INVOCATION_NAME = 'Pluto'
 SKILL_NAME = 'Pluto the Astronomer'
-SKILL_VERSION = '0.1.1'
+SKILL_VERSION = '0.2.0'
