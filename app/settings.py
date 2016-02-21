@@ -6,6 +6,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DATABASE_FILE = os.path.join(BASE_DIR, 'db.sqlite')
 
-SKILL_VERSION = '0.1.1'
 SKILL_INVOCATION_NAME = 'Pluto'
 SKILL_NAME = 'Pluto the Astronomer'
+SKILL_VERSION = '0.1.1'
