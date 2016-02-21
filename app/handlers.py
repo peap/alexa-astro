@@ -19,8 +19,12 @@ def intent_handler(name):
     return wrapper
 
 
-def welcome(alexa_request):
-    return AlexaResponse('Hello. Try asking me what\'s visible in the sky.')
+@intent_handler('GetLocation')
+def get_location(alexa_request):
+    lat, lon, city = alexa_request.user.get_location()
+    if city:
+        return AlexaResponse('I have {0} as your current location.'.format(city))
+    return AlexaResponse('hi')
 
 
 @intent_handler('AMAZON.HelpIntent')
@@ -62,3 +66,7 @@ def set_location(alexa_request):
             'Please request a city. Setting latitude and longitude is not yet '
             'supported.'
         )
+
+
+def welcome(alexa_request):
+    return AlexaResponse('Hello. Try asking me what\'s visible in the sky.')
