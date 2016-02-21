@@ -38,7 +38,7 @@ def set_location(alexa_request):
     if requested_city:
         city, coords = get_coordinates_for_city(requested_city)
         try:
-            alexa_request.user.set_location(*coords, city)
+            alexa_request.user.set_location(coords[0], coords[1], city)
         except CityNotFound:
             response = AlexaResponse(
                 'I couldn\'t find a city called "{0}".'
