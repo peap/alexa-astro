@@ -10,12 +10,16 @@ logger = logging.getLogger(__name__)
 
 
 class AlexaRequest():
+    intent_name = None
+
     def __init__(self, flask_request):
         self.flask_request = flask_request
         self.data = flask_request.json
         self.request_type = self.data['request']['type']
         self.session = self.data['session']
         self.user = AlexaUser(self.session['user']['userId'])
+        if self.request_type == 'IntentRequest':
+            self.intent_name = self.data['request']['intent']['name']
 
     def is_valid(self):
         # check Application ID
@@ -174,7 +178,7 @@ def get_response(request):
     if alexa_request.request_type == 'LaunchRequest':
         return handlers.welcome(alexa_request)
     elif alexa_request.request_type == 'IntentRequest':
-        intent_name = alexa_request['intent']['name']
+        intent_name = alexa_request.intent_name
         func = handlers.INTENTS.get(intent_name)
         if func:
             return func(alexa_request)
