@@ -63,6 +63,7 @@ class AlexaResponse():
         self.session_attributes = {}
 
     def ask(self, question):
+        self.ends_session = False
         self.reprompt_speech = question
 
     def card(self, title, text):

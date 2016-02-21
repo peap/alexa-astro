@@ -75,6 +75,8 @@ def intent_dispatcher(alexa_request):
 
 @request_handler('SessionEndedRequest')
 def session_ended(alexa_request):
+    # No response is allowed for a SessionEndedRequest, but just in case Amazon
+    # changes their mind about that...
     return AlexaResponse('So long, and keep looking up!')
 
 
@@ -93,8 +95,20 @@ def overview(alexa_request):
 def get_location(alexa_request):
     lat, lon, city = alexa_request.user.get_location()
     if city:
-        return AlexaResponse('I have {0} as your current location.'.format(city))
-    return AlexaResponse('hi')
+        response = AlexaResponse(
+            'I have {0} as your current location.'.format(city)
+        )
+        if lat and lon:
+            card_text = (
+                'Pluto has the following coordinates for {0}:\n'
+                'Latitude:  {1}\n'
+                'Longitude: {2}'
+                .format(city, lat, lon)
+            )
+            response.card('Coordinates of {0}'.format(city), card_text)
+    else:
+        response = AlexaResponse('hi')
+    return response
 
 
 @intent_handler('SetLocation')
@@ -104,6 +118,8 @@ def set_location(alexa_request):
     if requested_city:
         if requested_state:
             search_str = ', '.join([requested_city, requested_state])
+        else:
+            search_str = requested_city
         try:
             city, coords = get_coordinates_for_city(
                 requested_city, state=requested_state)
