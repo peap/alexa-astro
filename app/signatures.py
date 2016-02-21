@@ -2,7 +2,8 @@
 Check signatures of incoming requests, to ensure they come from Alexa.
 
 See: https://developer.amazon.com/appsandservices/solutions/alexa/alexa-skills-kit/
-     docs/developing-an-alexa-skill-as-a-web-service#verifying-the-signature-certificate-url
+     docs/developing-an-alexa-skill-as-a-web-service
+     #verifying-the-signature-certificate-url
 """
 from base64 import b64decode
 from urllib.parse import urlparse
@@ -33,9 +34,7 @@ def cert_chain_url_valid(cert_url):
 
 
 def parse_certificate(cert_url):
-    """
-    Get, parse, and return the PEM certificate at the given URL.
-    """
+    """Get, parse, and return the PEM certificate at the given URL."""
     normalized_url = url_normalize(cert_url)
     cert_request = requests.get(normalized_url)
     cert_text = cert_request.text
@@ -43,6 +42,7 @@ def parse_certificate(cert_url):
 
 
 def signature_valid(signature, cert_text, data):
+    """Verify signature against certificate text and signed data."""
     certificate = crypto.load_certificate(crypto.FILETYPE_PEM, cert_text)
     decoded_signature = b64decode(signature)
     try:
