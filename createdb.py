@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-import sqlite3
-
-from app import app, settings
+from app import app
 from app.db import get_db
 
 

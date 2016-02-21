@@ -1,5 +1,4 @@
 import logging
-import sqlite3
 
 from flask import abort
 
@@ -8,6 +7,41 @@ from app.db import get_db, query_db
 from app.signatures import cert_chain_url_valid, parse_certificate, signature_valid
 
 logger = logging.getLogger(__name__)
+
+
+class AlexaRequest():
+    def __init__(self, flask_request):
+        self.flask_request = flask_request
+        self.data = flask_request.json
+        self.request_type = self.data['request']['type']
+        self.session = self.data['session']
+        self.user = AlexaUser(self.session['user']['userId'])
+
+    def is_valid(self):
+        # check Application ID
+        sent_id = self.session['application']['applicationId']
+        if sent_id != settings.AMAZON_APPLICATION_ID:
+            # TODO: log
+            return False
+
+        # check timestamp
+        # TODO!
+
+        # check certificate URL
+        cert_chain_url = self.flask_request.headers.get('SignatureCertChainUrl')
+        if not cert_chain_url_valid(cert_chain_url):
+            # TODO: log
+            return False
+
+        # check signature
+        signature = self.flask_request.headers.get('Signature')
+        cert_text = parse_certificate(cert_chain_url)
+        request_body = self.flask_request.data
+        if not signature_valid(signature, cert_text, request_body):
+            # TODO: log
+            return False
+
+        return True
 
 
 class AlexaResponse():
@@ -80,6 +114,7 @@ class AlexaUser():
             data = self.get_data_by_id(user_id)
 
         self.pk = data['id']
+        self.city = data['city']
         self.latitude = data['latitude']
         self.longitude = data['longitude']
 
@@ -92,9 +127,9 @@ class AlexaUser():
         db.commit()
 
     @classmethod
-    def get_data_by_id(self, user_id):
+    def get_data_by_id(cls, user_id):
         query = (
-            'select id, latitude, longitude from alexa_users '
+            'select id, latitude, longitude, city from alexa_users '
             'where amazon_id = ?'
         )
         user_data = query_db(query, args=[user_id], one=True)
@@ -105,81 +140,49 @@ class AlexaUser():
                 'id': user_data[0],
                 'latitude': user_data[1],
                 'longitude': user_data[2],
+                'city': user_data[3],
             }
 
+    def get_location(self):
+        return (self.latitude, self.longitude, self.city)
 
-def alexa_request_valid(request):
-    # check Application ID
-    event = request.json
-    sent_id = event['session']['application']['applicationId']
-    if sent_id != settings.AMAZON_APPLICATION_ID:
-        # TODO: log
-        return False
-
-    # check timestamp
-    # TODO!
-
-    # check certificate URL
-    cert_chain_url = request.headers.get('SignatureCertChainUrl')
-    if not cert_chain_url_valid(cert_chain_url):
-        # TODO: log
-        return False
-
-    # check signature
-    signature = request.headers.get('Signature')
-    cert_text = parse_certificate(cert_chain_url)
-    request_body = request.data
-    if not signature_valid(signature, cert_text, request_body):
-        # TODO: log
-        return False
-
-    return True
+    def set_location(self, latitude, longitude, city):
+        db = get_db()
+        cur = db.cursor()
+        query = (
+            'update alexa_users set latitude=?, longitude=?, city=?  '
+            'where amazon_id = ?',
+        )
+        cur.execute(query, [latitude, longitude, city, self.user_id])
+        db.commit()
+        self.latitude = latitude
+        self.longitude = longitude
+        self.city = city
 
 
 def get_response(request):
+    from app import handlers
+
     try:
-        event = request.json
+        alexa_request = AlexaRequest(request.json)
     except ValueError:
         abort(400)
 
-    if not alexa_request_valid(request):
+    if not alexa_request.is_valid():
         abort(403)
 
-    session = event.get('session', {})
-    request = event.get('request', {})
-    if not session or not request:
-        # bad request
-        return AlexaResponse('Sorry, there was an error.')
-
-    user = AlexaUser(session['user']['userId'])
-
-    event_type = request['type']
-
-    intents = {
-        'AMAZON.HelpIntent': help,
-    }
-
-    if event_type == 'LaunchRequest':
-        return AlexaResponse(
-            'Hi! Call me {0}. Try asking me about a planet.'
-            .format(settings.SKILL_INVOCATION_NAME)
-        )
-    elif event_type == 'IntentRequest':
+    if alexa_request.request_type == 'LaunchRequest':
+        return handlers.welcome(alexa_request)
+    elif alexa_request.request_type == 'IntentRequest':
         intent_name = request['intent']['name']
-        func = intents.get(intent_name)
+        func = handlers.INTENTS.get(intent_name)
         if func:
-            return func(event)
+            return func(alexa_request)
         else:
+            logger.warning('Got an unhandled intent: {0}'.format(intent_name))
             return AlexaResponse('Sorry, that feature isn\'t ready yet.')
-    elif event_type == 'SessionEndedRequest':
+    elif alexa_request.request_type == 'SessionEndedRequest':
         return AlexaResponse('Goodbye.')
     else:
         # weirrrrrd
         return AlexaResponse('I am not sure what you meant.')
-
-
-def help(event):
-    data = AlexaResponse(
-        'Ask me about a planet, a moon, or what you see in the sky.'
-    )
-    return data
