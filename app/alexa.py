@@ -22,7 +22,7 @@ class AlexaRequest():
         self.user = AlexaUser(self.session['user']['userId'])
         if self.request_type == 'IntentRequest':
             self.intent_name = self.data['request']['intent']['name']
-            self.slots = self.data['request']['intent']['slots']
+            self.slots = self.data['request']['intent'].get('slots')
 
     def is_valid(self):
         # check Application ID
