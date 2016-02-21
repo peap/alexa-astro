@@ -121,9 +121,9 @@ class AlexaUser():
             data = self.get_data_by_id(user_id)
 
         self.pk = data['id']
-        self.city = data['city']
         self.latitude = data['latitude']
         self.longitude = data['longitude']
+        self.city = data['city']
 
     @classmethod
     def create(cls, user_id):

@@ -17,12 +17,12 @@ class CityNotSpecificEnough(Exception):
     pass
 
 
-def add_coordinates_to_db(city, coords):
+def add_coordinates_to_db(coords, city):
     db = get_db()
     cur = db.cursor()
     cur.execute(
-        'insert into locations(city, latitude, longitude) values (?, ?, ?)',
-        [city, str(coords[0]), str(coords[1])],
+        'insert into locations(latitude, longitude, city) values (?, ?, ?)',
+        [str(coords[0]), str(coords[1]), city],
     )
     db.commit()
 
@@ -71,5 +71,5 @@ def get_coordinates_for_city(city, state=None):
         raise CityNotFound()
     else:
         coords = (lat.quantize(FIVE_PLACES), lon.quantize(FIVE_PLACES))
-        add_coordinates_to_db(search_str, coords)
+        add_coordinates_to_db(coords, search_str)
         return (page.title, coords)
