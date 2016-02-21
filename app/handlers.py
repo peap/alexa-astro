@@ -83,12 +83,17 @@ def session_ended(alexa_request):
 # Intent handlers
 
 @intent_handler('AMAZON.HelpIntent')
-def overview(alexa_request):
+def help(alexa_request):
     return AlexaResponse(
         'Pluto the astronomer can tell you what\'s visible in the sky, what '
         'you\'re looking at, and when objects will rise and set. Try asking '
         'about a planet, or what\'s visible right now.'
     )
+
+
+@intent_handler('AMAZON.StopIntent')
+def stop(alexa_request):
+    return AlexaResponse('So long, and keep looking up!')
 
 
 @intent_handler('GetLocation')
