@@ -160,7 +160,7 @@ class AlexaUser():
             'update alexa_users set latitude=?, longitude=?, city=?  '
             'where amazon_id = ?'
         )
-        cur.execute(query, [latitude, longitude, city, self.user_id])
+        cur.execute(query, [str(latitude), str(longitude), city, self.user_id])
         db.commit()
         self.latitude = latitude
         self.longitude = longitude
