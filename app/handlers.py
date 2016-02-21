@@ -2,6 +2,7 @@ import logging
 
 from app import settings
 from app.alexa import AlexaResponse
+from app.astro import get_visible_objects
 from app.location import (
     CityNotFound, CityNotSpecificEnough, get_coordinates_for_city,
 )
@@ -85,10 +86,23 @@ def session_ended(alexa_request):
 @intent_handler('AMAZON.HelpIntent')
 def help(alexa_request):
     return AlexaResponse(
-        'Pluto the astronomer can tell you what\'s visible in the sky, what '
+        '{0} can tell you what\'s visible in the sky, what '
         'you\'re looking at, and when objects will rise and set. Try asking '
         'about a planet, or what\'s visible right now.'
+        .format(settings.SKILL_NAME)
     )
+
+
+@intent_handler('AMAZON.NoIntent')
+def no(alexa_request):
+    # look in session for what this no means...
+    return AlexaResponse('fine')
+
+
+@intent_handler('AMAZON.YesIntent')
+def yes(alexa_request):
+    # look in session for what this yes means...
+    return AlexaResponse('great!')
 
 
 @intent_handler('AMAZON.StopIntent')
@@ -105,7 +119,7 @@ def get_location(alexa_request):
         )
         if lat and lon:
             card_text = (
-                'Pluto has the following coordinates for {0}:\n'
+                'I have the following coordinates for {0}:\n'
                 'Latitude:  {1}\n'
                 'Longitude: {2}'
                 .format(city, lat, lon)
@@ -118,16 +132,12 @@ def get_location(alexa_request):
 
 @intent_handler('SetLocation')
 def set_location(alexa_request):
-    requested_city = alexa_request.slots['City'].get('value')
-    requested_state = alexa_request.slots['State'].get('value')
-    if requested_city:
-        if requested_state:
-            search_str = ', '.join([requested_city, requested_state])
-        else:
-            search_str = requested_city
+    in_city = alexa_request.slots['City'].get('value')
+    in_state = alexa_request.slots['State'].get('value')
+    if in_city:
+        search_str = ', '.join([in_city, in_state]) if in_state else in_city
         try:
-            city, coords = get_coordinates_for_city(
-                requested_city, state=requested_state)
+            city, coords = get_coordinates_for_city(in_city, state=in_state)
         except CityNotFound:
             response = AlexaResponse(
                 'I couldn\'t find a city called {0}.'.format(search_str)
@@ -139,12 +149,107 @@ def set_location(alexa_request):
                 .format(search_str)
             )
             response.ask('Which one do you mean?')
+            response.add_to_session('city', in_city)
         else:
             alexa_request.user.set_location(coords[0], coords[1], city)
             response = AlexaResponse('Location set to {0}.'.format(city))
         return response
     else:
-        return AlexaResponse(
-            'Please request a city. Setting latitude and longitude is not yet '
-            'supported.'
-        )
+        if in_state:
+            previous_city = alexa_request.session.get('city')
+            search_str = (
+                ', '.join([previous_city, in_state]) if previous_city else in_state
+            )
+            try:
+                if previous_city:
+                    city, coords = get_coordinates_for_city(previous_city, state=in_state)
+                else:
+                    # this seems to work, but... naming :/
+                    city, coords = get_coordinates_for_city(in_state)
+            except CityNotFound:
+                response = AlexaResponse(
+                    'I couldn\'t find a city called {0}.'.format(search_str)
+                )
+            except CityNotSpecificEnough:
+                response = AlexaResponse(
+                    'There are multiple places named {0}.'
+                    .format(search_str)
+                )
+                response.ask('Which one do you mean?')
+                response.add_to_session('city', in_city)
+            else:
+                alexa_request.user.set_location(coords[0], coords[1], city)
+                response = AlexaResponse('Location set to {0}.'.format(city))
+        else:
+            return AlexaResponse('You can set your location by telling me a city.')
+
+
+@intent_handler('WhatsVisible')
+def whats_visible(alexa_request):
+    response = None
+    user = alexa_request.user
+    lat, lon, city = user.get_location()
+    if city:
+        if lat and lon:
+            visible_objects = get_visible_objects(lat, lon)
+            if len(visible_objects) == 0:
+                response = AlexaResponse(
+                    'Currently, there are no interesting objects visible. '
+                    'To find out when something will rise, say "Alexa, ask '
+                    '{0} when Jupiter will rise."'
+                    .format(settings.SKILL_INVOCATION_NAME)
+                )
+            if len(visible_objects) == 1:
+                obj = visible_objects[0]
+                response = AlexaResponse(
+                    'There\'s only one object visible right now, {0.name}. '
+                    'You can find it at {0.azimuth} degrees azimuth and '
+                    '{0.altitude} degrees altitude.'
+                    .format(obj)
+                )
+            elif len(visible_objects) == 2:
+                obj1, obj2 = visible_objects[:2]
+                response = AlexaResponse(
+                    'There are a couple objects visible right now, {0.name} '
+                    'and {1.name}. To locate them, say "Alexa, ask {2} about '
+                    '{0.name}".'
+                    .format(obj1, obj2, settings.SKILL_INVOCATION_NAME)
+                )
+            elif len(visible_objects) == 3:
+                obj1, obj2, obj3 = visible_objects[:3]
+                response = AlexaResponse(
+                    'There are a few objects visible right now, {0.name}, '
+                    '{1.name}, and {2.name}. To locate them, say "Alexa, ask '
+                    '{3} about {0.name}".'
+                    .format(obj1, obj2, obj3, settings.SKILL_INVOCATION_NAME)
+                )
+            else:
+                obj1, obj2, obj3 = visible_objects[:3]
+                response = AlexaResponse(
+                    'There are a several objects visible right now, including '
+                    '{0.name}, {1.name}, and {2.name}. To locate them, say '
+                    '"Alexa, ask {3} about {0.name}".'
+                    .format(obj1, obj2, obj3, settings.SKILL_INVOCATION_NAME)
+                )
+                response.ask('Would you like to hear the entire list?')
+                response.add_to_session('previousIntent', 'WhatsVisible')
+                response.add_to_session('question', 'hear full list')
+        else:
+            # have a city, but not lat and lon...
+            logging.error(
+                'User {0} has a city ({1}), is missing latitude and/or longitude.'
+                .format(user, city)
+            )
+    if response is None:
+        if alexa_request.session['new']:
+            response = AlexaResponse(
+                'Hello from {0}. To get started, I need to know where you\'re '
+                'located.'
+                .format(settings.SKILL_NAME)
+            )
+        else:
+            response = AlexaResponse('I don\'t know your location.')
+        response.ask('What city are you closest to?')
+        response.add_to_session('previousIntent', 'WhatsVisible')
+        response.add_to_session('question', 'closest city')
+    return response

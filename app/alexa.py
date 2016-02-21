@@ -62,6 +62,9 @@ class AlexaResponse():
         self.ends_session = ends_session
         self.session_attributes = {}
 
+    def add_to_session(self, key, val):
+        self.session_attributes[key] = val
+
     def ask(self, question):
         self.ends_session = False
         self.reprompt_speech = question

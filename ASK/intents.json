@@ -1,9 +1,7 @@
 {
   "intents": [
 
-    {
-      "intent": "GetLocation"
-    },
+    {"intent": "GetLocation"},
 
     {
       "intent": "SetLocation",
@@ -105,13 +103,10 @@
       ]
     },
 
-    {
-      "intent": "AMAZON.HelpIntent"
-    },
-
-    {
-      "intent": "AMAZON.StopIntent"
-    }
+    {"intent": "AMAZON.HelpIntent"},
+    {"intent": "AMAZON.NoIntent"},
+    {"intent": "AMAZON.StopIntent"},
+    {"intent": "AMAZON.YesIntent"}
 
   ]
 }

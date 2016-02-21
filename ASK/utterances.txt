@@ -2,6 +2,8 @@ GetLocation my location
 GetLocation where I am
 GetLocation where we are
 
+SetLocation {City} {State}
+SetLocation {State}
 SetLocation I'm in {City}
 SetLocation I'm in {City} {State}
 SetLocation change my location to {City}
