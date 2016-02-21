@@ -11,15 +11,18 @@ logger = logging.getLogger(__name__)
 
 class AlexaRequest():
     intent_name = None
+    slots = None
 
     def __init__(self, flask_request):
         self.flask_request = flask_request
         self.data = flask_request.json
         self.request_type = self.data['request']['type']
         self.session = self.data['session']
+        self.timestamp = self.data['request']['timestamp']
         self.user = AlexaUser(self.session['user']['userId'])
         if self.request_type == 'IntentRequest':
             self.intent_name = self.data['request']['intent']['name']
+            self.slots = self.data['request']['intent']['slots']
 
     def is_valid(self):
         # check Application ID
