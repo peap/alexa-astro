@@ -6,6 +6,7 @@ from flask import jsonify, render_template, request
 from app import app, alexa
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @app.route('/', methods=['GET'])
