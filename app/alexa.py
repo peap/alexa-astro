@@ -174,7 +174,7 @@ def get_response(request):
     if alexa_request.request_type == 'LaunchRequest':
         return handlers.welcome(alexa_request)
     elif alexa_request.request_type == 'IntentRequest':
-        intent_name = request['intent']['name']
+        intent_name = alexa_request['intent']['name']
         func = handlers.INTENTS.get(intent_name)
         if func:
             return func(alexa_request)
