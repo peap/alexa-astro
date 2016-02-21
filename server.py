@@ -17,7 +17,8 @@ def homepage():
 def incoming_alexa_request():
     try:
         alexa_response = alexa.get_response(request)
-    except ValueError:
+    except ValueError as e:
+        logger.exception(e)
         alexa_response = alexa.AlexaResponse('Bad request, sorry.')
     return jsonify(alexa_response.to_dict())
 
