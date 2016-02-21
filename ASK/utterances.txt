@@ -2,22 +2,27 @@ GetLocation my location
 GetLocation where I am
 GetLocation where we are
 
+SetLocation I'm in {City}
+SetLocation I'm in {City} {State}
 SetLocation change my location to {City}
+SetLocation change my location to {City} {State}
 SetLocation change my location to {City} {State}
 SetLocation set my location to {City}
 SetLocation set my location to {City} {State}
 SetLocation update my location to {City}
 SetLocation update my location to {City} {State}
+SetLocation we're in {City}
+SetLocation we're in {City} {State}
 SetLocation set my latitute to {LatDeg} degrees
-SetLocation set my latitute to {LatDeg} degrees {LatMin} minutes
 SetLocation set my latitute to {LatDeg} degrees and {LatMin} minutes
+SetLocation set my latitute to {LatDeg} degrees {LatMin} minutes and {LatSec} seconds
+SetLocation set my latitute to {LatDeg} degrees {LatMin} minutes
 SetLocation set my latitute to {LatDeg} degrees {LatMin} minutes {LatSec} seconds
-SetLocation set my latitute to {LatDeg} degrees and {LatMin} minutes and {LatSec} seconds
+SetLocation set my longitude to {LonDeg} degrees {LonMin} minutes and {LonSec} seconds {LonEastWest}
+SetLocation set my longitude to {LonDeg} degrees and {LonMin} minutes {LonEastWest}
 SetLocation set my longitude to {LonDeg} degrees {LonEastWest}
 SetLocation set my longitude to {LonDeg} degrees {LonMin} minutes {LonEastWest}
-SetLocation set my longitude to {LonDeg} degrees and {LonMin} minutes {LonEastWest}
 SetLocation set my longitude to {LonDeg} degrees {LonMin} minutes {LonSec} seconds {LonEastWest}
-SetLocation set my longitude to {LonDeg} degrees and {LonMin} minutes and {LonSec} seconds {LonEastWest}
 
 WhatsVisible what I can see
 WhatsVisible what I can see at {Time}
