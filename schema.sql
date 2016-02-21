@@ -5,3 +5,10 @@ CREATE TABLE IF NOT EXISTS alexa_users (
   longitude REAL,
   city      VARCHAR
 );
+
+CREATE TABLE IF NOT EXISTS locations (
+  id        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  city      VARCHAR NOT NULL,
+  latitude  REAL NOT NULL,
+  longitude REAL NOT NULL 
+);

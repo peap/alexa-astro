@@ -20,8 +20,11 @@ CITIES_ON_WIKIPEDIA = {
 
 
 class CityCoordinatesTestCase(TestCase):
+    @patch('app.location.add_coordinates_to_db')
+    @patch('app.location.get_coordinates_from_db')
     @patch('wikipedia.page')
-    def test_can_get_coordinates_for_large_cities(self, mock_page):
+    def test_can_get_coords_for_large_cities(self, mock_page, mock_get, mock_add):
+        mock_get.return_value = None
         for input_city, attrs in CITIES_ON_WIKIPEDIA.items():
             with open(attrs['pickle'], 'rb') as f:
                 mock_page.return_value = pickle.load(f)

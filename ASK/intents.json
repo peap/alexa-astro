@@ -13,6 +13,10 @@
           "type": "AMAZON.US_CITY"
         },
         {
+          "name": "State",
+          "type": "AMAZON.US_STATE"
+        },
+        {
           "name": "LatDeg",
           "type": "AMAZON.NUMBER"
         },
