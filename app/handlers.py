@@ -10,39 +10,37 @@ logger = logging.getLogger(__name__)
 
 # Decorators for handler registration
 
-REQUEST_TYPE_HANDLERS = {}
 INTENT_HANDLERS = {}
+REQUEST_TYPE_HANDLERS = {}
 
 
 def intent_handler(name):
-
+    """Register an intent handler for the given intent name."""
     def wrapper(func):
-        INTENT_HANDLERS[name] = func
-
         def inner(*args, **kwargs):
             return func(*args, **kwargs)
-
+        INTENT_HANDLERS[name] = func
         return inner
-
     return wrapper
 
 
 def request_handler(name):
-
+    """Register an request-type handler for the given request type."""
     def wrapper(func):
-        REQUEST_TYPE_HANDLERS[name] = func
-
         def inner(*args, **kwargs):
             return func(*args, **kwargs)
-
+        REQUEST_TYPE_HANDLERS[name] = func
         return inner
-
     return wrapper
 
 
 # Main controller
 
 def dispatch(alexa_request):
+    """
+    Dispatch the incoming, valid AlexaRequest to the appropriate request-type
+    handler.
+    """
     request_type = alexa_request.request_type
     request_type_handler = REQUEST_TYPE_HANDLERS.get(request_type)
     if callable(request_type_handler):
@@ -65,6 +63,7 @@ def welcome(alexa_request):
 
 @request_handler('IntentRequest')
 def intent_dispatcher(alexa_request):
+    """Dispatch the incoming AlexaRequest to the appropriate intent handler."""
     intent_name = alexa_request.intent_name
     intent_handler = INTENT_HANDLERS.get(intent_name)
     if callable(intent_handler):
