@@ -32,8 +32,8 @@ def get_visible_objects(lat, lon):
     """
     visible = []
     observer = ephem.Observer()
-    observer.lat = lat
-    observer.lon = lon
+    observer.lat = str(lat)
+    observer.lon = str(lon)
     for Planet in INTERESTING_PLANETS:
         planet = Planet()
         planet.compute(observer)
