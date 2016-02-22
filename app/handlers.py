@@ -1,4 +1,5 @@
 import logging
+from functools import wraps
 
 from app import settings
 from app.alexa import AlexaResponse
@@ -17,22 +18,24 @@ REQUEST_TYPE_HANDLERS = {}
 
 def intent_handler(name):
     """Register an intent handler for the given intent name."""
-    def wrapper(func):
-        def inner(*args, **kwargs):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
         INTENT_HANDLERS[name] = func
-        return inner
-    return wrapper
+        return wrapper
+    return decorator
 
 
 def request_handler(name):
     """Register an request-type handler for the given request type."""
-    def wrapper(func):
-        def inner(*args, **kwargs):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
         REQUEST_TYPE_HANDLERS[name] = func
-        return inner
-    return wrapper
+        return wrapper
+    return decorator
 
 
 # Main controller
