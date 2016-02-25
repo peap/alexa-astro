@@ -1,36 +1,10 @@
 #!/usr/bin/env python
 import logging
 
-from flask import abort, jsonify, render_template, request
-
 from app import app
-from app.alexa import AlexaRequest
-from app.handlers import dispatch
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('requests').setLevel(logging.WARNING)
-
-logger = logging.getLogger(__name__)
-
-
-@app.route('/', methods=['GET'])
-def homepage():
-    return render_template('home.html')
-
-
-@app.route('/alexa/', methods=['POST'])
-def incoming_alexa_request():
-    try:
-        alexa_request = AlexaRequest(request)
-    except ValueError:
-        abort(400)
-
-    if alexa_request.is_valid():
-        alexa_response = dispatch(alexa_request)
-    else:
-        abort(403)
-
-    return jsonify(alexa_response.to_dict())
 
 
 if __name__ == '__main__':

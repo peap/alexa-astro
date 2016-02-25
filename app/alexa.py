@@ -1,7 +1,9 @@
 import logging
+from contextlib import closing
+
+from flask import g
 
 from app import settings
-from app.db import get_db, query_db
 from app.signatures import cert_chain_url_valid, parse_certificate, signature_valid
 
 logger = logging.getLogger(__name__)
@@ -130,10 +132,10 @@ class AlexaUser():
     @classmethod
     def create(cls, user_id):
         logging.info('Creating user record for {0}'.format(user_id))
-        db = get_db()
-        cur = db.cursor()
-        cur.execute('insert into alexa_users(amazon_id) values (?)', [user_id])
-        db.commit()
+        query = 'insert into alexa_users(amazon_id) values (?)'
+        with closing(g.db.cursor()) as cursor:
+            cursor.execute(query, [user_id])
+            g.db.commit()
 
     @classmethod
     def get_data_by_id(cls, user_id):
@@ -141,29 +143,33 @@ class AlexaUser():
             'select id, latitude, longitude, city from alexa_users '
             'where amazon_id = ?'
         )
-        user_data = query_db(query, args=[user_id], one=True)
-        if user_data is None:
+        with closing(g.db.cursor()) as cursor:
+            cursor.execute(query, [user_id])
+            row = cursor.fetchone()
+        if row is None:
             return None
         else:
             return {
-                'id': user_data[0],
-                'latitude': user_data[1],
-                'longitude': user_data[2],
-                'city': user_data[3],
+                'id': row[0],
+                'latitude': row[1],
+                'longitude': row[2],
+                'city': row[3],
             }
 
     def get_location(self):
         return (self.latitude, self.longitude, self.city)
 
     def set_location(self, latitude, longitude, city):
-        db = get_db()
-        cur = db.cursor()
         query = (
             'update alexa_users set latitude=?, longitude=?, city=?  '
             'where amazon_id = ?'
         )
-        cur.execute(query, [str(latitude), str(longitude), city, self.user_id])
-        db.commit()
+        with closing(g.db.cursor()) as cursor:
+            cursor.execute(
+                query,
+                [str(latitude), str(longitude), city, self.user_id],
+            )
+            g.db.commit()
         self.latitude = latitude
         self.longitude = longitude
         self.city = city

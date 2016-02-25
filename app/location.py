@@ -1,10 +1,10 @@
-from decimal import Decimal
 import warnings
+from contextlib import closing
+from decimal import Decimal
 
+from flask import g
 import wikipedia
 from wikipedia.exceptions import DisambiguationError, PageError
-
-from app.db import get_db, query_db
 
 FIVE_PLACES = Decimal(10) ** -5
 
@@ -18,21 +18,17 @@ class CityNotSpecificEnough(Exception):
 
 
 def add_coordinates_to_db(coords, city):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(
-        'insert into locations(latitude, longitude, city) values (?, ?, ?)',
-        [str(coords[0]), str(coords[1]), city],
-    )
-    db.commit()
+    query = 'insert into locations(latitude, longitude, city) values (?, ?, ?)'
+    with closing(g.db.cursor()) as cursor:
+        cursor.execute(query, [str(coords[0]), str(coords[1]), city])
+        g.db.commit()
 
 
 def get_coordinates_from_db(city):
-    row = query_db(
-        'select latitude, longitude from locations where city = ?',
-        [city],
-        one=True,
-    )
+    query = 'select latitude, longitude from locations where city = ?'
+    with closing(g.db.cursor()) as cursor:
+        cursor.execute(query, [city])
+        row = cursor.fetchone()
     if row:
         return (Decimal(row[0]), Decimal(row[1]))
     else:

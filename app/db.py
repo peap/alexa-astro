@@ -1,25 +1,32 @@
+import os
 import sqlite3
+from contextlib import closing
+
 from flask import g
 
 from app import app, settings
 
-
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(settings.DATABASE_FILE)
-    return db
+SCHEMA_FILE = os.path.join(settings.BASE_DIR, 'schema.sql')
 
 
-def query_db(query, args=(), one=False):
-    cur = get_db().execute(query, args)
-    rows = cur.fetchall()
-    cur.close()
-    return (rows[0] if rows else None) if one else rows
+def connect_db():
+    return sqlite3.connect(app.config['DATABASE_FILE'])
+
+
+def init_db():
+    with closing(connect_db()) as db:
+        with app.open_resource(SCHEMA_FILE, mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
+
+
+@app.before_request
+def before():
+    g.db = connect_db()
 
 
 @app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+@app.teardown_request
+def teardown(exception):
+    if hasattr(g, 'db'):
+        g.db.close()
