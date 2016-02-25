@@ -2,9 +2,8 @@ import os
 import tempfile
 from unittest.mock import Mock
 
-from app import app
+from app import app, init_db
 from app.alexa import AlexaRequest
-from app.db import init_db
 
 original_is_valid = AlexaRequest.is_valid
 
