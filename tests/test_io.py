@@ -1,10 +1,10 @@
 from unittest import TestCase
 
-from tests.io import CaptureStdout
+from tests.io import capture_stdout
 
 
 class CaptureStdoutTestCase(TestCase):
     def test_stdout_capturing(self):
-        with CaptureStdout() as stdout:
+        with capture_stdout() as captor:
             print('oh hi')  # NOQA
-        self.assertEqual(str(stdout), 'oh hi\n')
+        self.assertEqual(captor['value'], 'oh hi\n')

@@ -1,32 +1,27 @@
 import sys
+from contextlib import contextmanager
 from io import StringIO
 
 
-class CaptureStdout():
+@contextmanager
+def capture_stdout():
     """
-    Capture STDOUT as self.value when used as a context manager.
+    Capture STDOUT. Captured data is available in the returned dictionary's
+    "value" key.
 
     Example:
         class PrintingTestCase(TestCase):
             def test_printing(self):
-                with CaptureStdout() as stdout:
+                with capture_stdout() as captor:
                     print('oh hi')
-                self.assertEqual(str(stdout), 'oh hi\n')
+                self.assertEqual(stdout['value'], 'oh hi\n')
     """
-
-    def __init__(self):
-        self.value = ''
-        self.old_stdout = None
-
-    def __str__(self):
-        return self.value
-
-    def __enter__(self):
-        self.old_stdout = sys.stdout
-        sys.stdout = StringIO()
-        return self
-
-    def __exit__(self, *exc_info):
-        self.value = sys.stdout.getvalue()
+    old_stdout = sys.stdout
+    captor = {'stdout': StringIO(), 'value': None}
+    sys.stdout = captor['stdout']
+    try:
+        yield captor
+    finally:
+        captor['value'] = sys.stdout.getvalue()
         sys.stdout.close()
-        sys.stdout = self.old_stdout
+        sys.stdout = old_stdout
