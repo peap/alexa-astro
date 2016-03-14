@@ -1,7 +1,9 @@
 import ephem
 
 
-INTERESTING_PLANETS = [
+INTERESTING_OBJECTS = [
+    ephem.Sun,
+    ephem.Moon,
     ephem.Mercury,
     ephem.Venus,
     ephem.Mars,
@@ -34,9 +36,9 @@ def get_visible_objects(lat, lon):
     observer = ephem.Observer()
     observer.lat = str(lat)
     observer.lon = str(lon)
-    for Planet in INTERESTING_PLANETS:
-        planet = Planet()
-        planet.compute(observer)
-        if planet.alt >= MIN_ALT:
-            visible.append(AstroObject(planet, observer))
+    for object_class in INTERESTING_OBJECTS:
+        obj = object_class()
+        obj.compute(observer)
+        if obj.alt >= MIN_ALT:
+            visible.append(AstroObject(obj, observer))
     return visible
