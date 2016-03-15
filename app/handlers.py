@@ -69,9 +69,10 @@ def welcome(alexa_request):
 
 
 @request_handler('IntentRequest')
-def intent_dispatcher(alexa_request):
+def intent_dispatcher(alexa_request, intent_name=None):
     """Dispatch the incoming AlexaRequest to the appropriate intent handler."""
-    intent_name = alexa_request.intent_name
+    if intent_name is None:
+        intent_name = alexa_request.intent_name
     intent_handler = INTENT_HANDLERS.get(intent_name)
     if callable(intent_handler):
         return intent_handler(alexa_request)
@@ -102,13 +103,17 @@ def help(alexa_request):
 @intent_handler('AMAZON.NoIntent')
 def no(alexa_request):
     # look in session for what this no means...
-    return AlexaResponse('fine')
+    return AlexaResponse('Ok.')
 
 
 @intent_handler('AMAZON.YesIntent')
 def yes(alexa_request):
-    # look in session for what this yes means...
-    return AlexaResponse('great!')
+    if 'previousIntent' in alexa_request.session:
+        intent_name = alexa_request.session.get('previousIntent')
+        handler = intent_dispatcher(alexa_request, intent_name=intent_name)
+        return handler(alexa_request, continuing_session=True)
+    else:
+        return AlexaResponse('great!')
 
 
 @intent_handler('AMAZON.StopIntent')
@@ -137,7 +142,7 @@ def get_location(alexa_request):
 
 
 @intent_handler('SetLocation')
-def set_location(alexa_request):
+def set_location(alexa_request, continuing_session=False):
     in_city = alexa_request.slots['City'].get('value')
     in_state = alexa_request.slots['State'].get('value')
     if in_city:
@@ -193,7 +198,7 @@ def set_location(alexa_request):
 
 
 @intent_handler('WhatsVisible')
-def whats_visible(alexa_request):
+def whats_visible(alexa_request, continuing_session=False):
     response = None
     user = alexa_request.user
     lat, lon, city = user.get_location()
@@ -230,18 +235,25 @@ def whats_visible(alexa_request):
                     .format(obj1, obj2, obj3)
                 )
             else:
-                obj1, obj2, obj3 = visible_objects[:3]
-                response = AlexaResponse(
-                    'There are a several objects visible right now, including '
-                    '{0.name}, {1.name}, and {2.name}. '
-                    'Would you like to hear the entire list?'
-                    .format(obj1, obj2, obj3)
-                )
-                response.reprompt(
-                    'Would you like to hear the entire list of visible objects?'
-                )
-                response.add_to_session('previousIntent', 'WhatsVisible')
-                response.add_to_session('question', 'hear full list')
+                if not continuing_session:
+                    obj1, obj2, obj3 = visible_objects[:3]
+                    response = AlexaResponse(
+                        'There are a several objects visible right now, including '
+                        '{0.name}, {1.name}, and {2.name}. '
+                        'Would you like to hear the entire list?'
+                        .format(obj1, obj2, obj3)
+                    )
+                    response.reprompt(
+                        'Would you like to hear the entire list of visible objects?'
+                    )
+                    response.add_to_session('previousIntent', 'WhatsVisible')
+                    response.add_to_session('question', 'hear full list')
+                else:
+                    *head, tail = [obj.name for obj in visible_objects]
+                    response = AlexaResponse(
+                        'Here\'s what\'s visible right now: {0}, and {1}.'
+                        .format(', '.join(head), tail)
+                    )
         else:
             # have a city, but not lat and lon...
             logging.error(
