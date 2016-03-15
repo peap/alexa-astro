@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from unittest.mock import patch
 
 from behave import given, then, when
 from flask import g
