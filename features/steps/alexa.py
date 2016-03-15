@@ -3,15 +3,16 @@ from datetime import datetime
 from unittest.mock import patch
 
 from behave import given, then, when
+from flask import g
 
-from app import app, settings
+from app import app, connect_db, settings
 from app.alexa import AlexaUser
 
 TEST_USER_ID = 'amzn1.account.AM3B00000000000000000000000'
 TEST_USER_DATA = {
     'id': TEST_USER_ID,
-    'latitude': 0.0,
-    'longitude': 0.0,
+    'latitude': 40.0,
+    'longitude': -100.0,
     'city': 'Middle of the Ocean',
 }
 
@@ -59,14 +60,22 @@ def launched_by_new_user(context):
 
 @when('a known user launches Pluto')
 def launched_by_known_user(context):
-    data = base_alexa_request('LaunchRequest')
-    with patch('app.alexa.AlexaUser.get_data_by_id') as mock_gdbi:
-        mock_gdbi.return_value = TEST_USER_DATA
-        context.response = context.client.post(
-            '/alexa/',
-            data=json.dumps(data),
-            content_type='application/json',
+    with app.app_context():
+        g.db = connect_db()
+        user = AlexaUser(TEST_USER_ID)
+        user.set_location(
+            TEST_USER_DATA['latitude'],
+            TEST_USER_DATA['longitude'],
+            TEST_USER_DATA['city'],
         )
+    data = base_alexa_request('LaunchRequest')
+#    with patch('app.alexa.AlexaUser.get_data_by_id') as mock_gdbi:
+#        mock_gdbi.return_value = TEST_USER_DATA
+    context.response = context.client.post(
+        '/alexa/',
+        data=json.dumps(data),
+        content_type='application/json',
+    )
     assert context.response
 
 
@@ -83,4 +92,5 @@ def existing_user_greeting(context):
     assert context.response.status_code == 200
     data = json.loads(context.response.data.decode('utf-8'))
     assert isinstance(data, dict)
-    assert 'Welcome back' in data['response']['outputSpeech']['text']
+    assert 'Welcome to' not in data['response']['outputSpeech']['text']
+    assert 'visible' in data['response']['outputSpeech']['text']

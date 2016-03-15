@@ -58,11 +58,14 @@ def dispatch(alexa_request):
 
 @request_handler('LaunchRequest')
 def welcome(alexa_request):
-    return AlexaResponse(
-        'Welcome to {0}. Try asking me what\'s visible in the sky by saying '
-        '"Alexa, ask {1} what\'s up."'
-        .format(settings.SKILL_NAME, settings.SKILL_INVOCATION_NAME)
-    )
+    if alexa_request.user.new:
+        return AlexaResponse(
+            'Welcome to {0}. Try asking me what\'s visible in the sky by saying '
+            '"ask {1} what\'s up."'
+            .format(settings.SKILL_NAME, settings.SKILL_INVOCATION_NAME)
+        )
+    else:
+        return whats_visible(alexa_request)
 
 
 @request_handler('IntentRequest')
@@ -245,7 +248,7 @@ def whats_visible(alexa_request):
         else:
             # have a city, but not lat and lon...
             logging.error(
-                'User {0} has a city ({1}), is missing latitude and/or longitude.'
+                'User {0} has a city ({1}), but is missing latitude and/or longitude.'
                 .format(user, city)
             )
     if response is None:
