@@ -10,7 +10,7 @@ original_is_valid = AlexaRequest.is_valid
 
 def before_feature(context, feature):
     app.config['TESTING'] = True
-    context.db, app.config['DATABASE_FILE'] = tempfile.mkstemp()
+    context.db_file, app.config['DATABASE_FILE'] = tempfile.mkstemp()
     context.client = app.test_client()
     init_db()
     AlexaRequest.is_valid = Mock(return_value=True)
@@ -18,5 +18,5 @@ def before_feature(context, feature):
 
 def after_feature(context, feature):
     AlexaRequest.is_valid = original_is_valid
-    os.close(context.db)
+    os.close(context.db_file)
     os.remove(app.config['DATABASE_FILE'])
