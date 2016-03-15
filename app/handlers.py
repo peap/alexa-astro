@@ -219,26 +219,23 @@ def whats_visible(alexa_request):
                 obj1, obj2 = visible_objects[:2]
                 response = AlexaResponse(
                     'There are a couple objects visible right now, {0.name} '
-                    'and {1.name}. To locate them, say "Alexa, ask {2} about '
-                    '{0.name}".'
+                    'and {1.name}.'
                     .format(obj1, obj2, settings.SKILL_INVOCATION_NAME)
                 )
             elif len(visible_objects) == 3:
                 obj1, obj2, obj3 = visible_objects[:3]
                 response = AlexaResponse(
                     'There are a few objects visible right now, {0.name}, '
-                    '{1.name}, and {2.name}. To locate them, say "Alexa, ask '
-                    '{3} about {0.name}".'
-                    .format(obj1, obj2, obj3, settings.SKILL_INVOCATION_NAME)
+                    '{1.name}, and {2.name}.'
+                    .format(obj1, obj2, obj3)
                 )
             else:
                 obj1, obj2, obj3 = visible_objects[:3]
                 response = AlexaResponse(
                     'There are a several objects visible right now, including '
-                    '{0.name}, {1.name}, and {2.name}. To locate them, say '
-                    '"Alexa, ask {3} about {0.name}". Would you like to hear '
-                    'the entire list?'
-                    .format(obj1, obj2, obj3, settings.SKILL_INVOCATION_NAME)
+                    '{0.name}, {1.name}, and {2.name}. '
+                    'Would you like to hear the entire list?'
+                    .format(obj1, obj2, obj3)
                 )
                 response.reprompt(
                     'Would you like to hear the entire list of visible objects?'
